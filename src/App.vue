@@ -1,13 +1,10 @@
 <template>
-  <h1>Hola</h1>
-  <h2>{{ contador }}</h2>
-  <button @click="contador++">+</button>
-  <button @click="contador--">-</button>
+  <Navbar />
+  <router-view />
 </template>
 
 <script setup>
-import { ref } from 'vue'
-const contador = ref(0);
+import Navbar from './components/Navbar.vue';
 </script>
 
 <style scoped></style>
