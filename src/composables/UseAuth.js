@@ -10,3 +10,8 @@ export function useAuth() {
 
   return { login_MagicLink }
 }
+
+import { useSupabase } from './supabase'
+const { supabase } = useSupabase()
+
+export function useAuth() {}
