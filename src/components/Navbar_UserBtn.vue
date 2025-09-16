@@ -1,22 +1,52 @@
 <template>
-    <button class="btn btn-outline-secondary mx-lg-2 my-2 my-lg-0" @click="handleClick">
-        {{ isLoggedIn ? 'Ver perfil' : 'Iniciar sesión' }}
+    <button :class="[
+        'btn mx-lg-2 my-2 my-lg-0',
+        isLoggedIn && currentRoute === '/perfil'
+            ? 'btn-outline-danger'
+            : 'btn-outline-secondary'
+    ]" @click="handleClick">
+        {{ buttonText }}
     </button>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from "vue"
+import { useSupabase } from "@/services/supabase"
+import { useRouter, useRoute } from "vue-router"
 
-// Simulación de estado de sesión (reemplaza con tu lógica real)
+const { supabase } = useSupabase()
+const router = useRouter()
+const route = useRoute()
+
 const isLoggedIn = ref(false)
+const currentRoute = computed(() => route.path)
 
-function handleClick() {
-    if (isLoggedIn.value) {
-        // Redirige al perfil
-        window.location.href = '/perfil'
+// Inicializar sesión
+onMounted(async () => {
+    const { data } = await supabase.auth.getSession()
+    isLoggedIn.value = !!data.session
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+        isLoggedIn.value = !!session
+    })
+})
+
+// Texto dinámico
+const buttonText = computed(() => {
+    if (!isLoggedIn.value) return "Iniciar sesión"
+    if (currentRoute.value === "/perfil") return "Cerrar sesión"
+    return "Ver perfil"
+})
+
+// Acción según estado
+async function handleClick() {
+    if (!isLoggedIn.value) {
+        router.push("/signin")
+    } else if (currentRoute.value === "/perfil") {
+        await supabase.auth.signOut()
+        router.push("/")
     } else {
-        // Redirige a login
-        window.location.href = '/signin'
+        router.push("/perfil")
     }
 }
 </script>

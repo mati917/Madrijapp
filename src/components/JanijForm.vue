@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import { useSupabase } from "../composables/supabase"
+import { useSupabase } from "../services/supabase"
 const { supabase } = useSupabase();
 
 export default {

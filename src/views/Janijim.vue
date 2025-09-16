@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { useSupabase } from "../composables/supabase"
+import { useSupabase } from "../services/supabase"
 const { supabase } = useSupabase();
 import { ref, onMounted } from "vue"
 import Janij from "../components/Janij.vue"

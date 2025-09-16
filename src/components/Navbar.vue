@@ -11,9 +11,6 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/">Confirmación</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="/janijim">Janijim</a>
                         </li>
                         <li class="nav-item dropdown">
@@ -33,11 +30,14 @@
                         <li class="nav-item">
                             <a class="nav-link disabled" aria-disabled="true">Mi Hadrajá</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" aria-disabled="true">Eventos</a>
+                        </li>
                     </ul>
-                    <form class="d-flex" role="search">
+                    <!--<form class="d-flex" role="search">
                         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                         <button class="btn btn-outline-success" type="submit">Search</button>
-                    </form>
+                    </form>-->
                     <Navbar_UserBtn class="col-12 col-lg-2" />
                 </div>
             </div>
