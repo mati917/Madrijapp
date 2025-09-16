@@ -2,7 +2,7 @@
     <header>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Madrijapp</a>
+                <a class="navbar-brand" href="/">Madrijapp</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -11,7 +11,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                            <a class="nav-link" aria-current="page" href="/">Confirmación</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/janijim">Janijim</a>
@@ -31,15 +31,20 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" aria-disabled="true">Peulot</a>
+                            <a class="nav-link disabled" aria-disabled="true">Mi Hadrajá</a>
                         </li>
                     </ul>
                     <form class="d-flex" role="search">
                         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
+                    <Navbar_UserBtn class="col-12 col-lg-2" />
                 </div>
             </div>
         </nav>
     </header>
 </template>
+
+<script setup>
+import Navbar_UserBtn from './Navbar_UserBtn.vue'
+</script>

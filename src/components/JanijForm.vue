@@ -78,7 +78,9 @@
 </template>
 
 <script>
-import { supabase } from "../supabase"
+import { useSupabase } from "../composables/supabase"
+const { supabase } = useSupabase();
+
 export default {
     name: "JanijForm",
     data() {
