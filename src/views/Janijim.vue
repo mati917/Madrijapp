@@ -1,9 +1,18 @@
 <template>
     <main class="container p-3">
-        <div id="headering" class="bg-primary text-white p-3 mb-4 rounded row">
+        <div id="headering" class="bg-primary bg-opacity-25 text-primary p-3 mb-4 rounded row">
             <h1 class="col-10">Janijim</h1>
-            <button type="button" id="add-janij" class="btn btn-outline-light col-2"
-                @click="showModal = true">Añadir</button>
+
+            <!-- Botón visible solo si hay sesión -->
+            <button v-if="isLoggedIn" type="button" id="add-janij" class="btn btn-outline-primary col-2"
+                @click="showModal = true">
+                Añadir
+            </button>
+        </div>
+
+        <!-- Error -->
+        <div v-if="errorMessage" class="alert alert-danger row" role="alert">
+            {{ errorMessage }}
         </div>
 
         <!-- Loading -->
@@ -11,60 +20,138 @@
             <div class="spinner-border text-primary" role="status"></div>
         </div>
 
-        <!-- Error -->
-        <div v-else-if="errorMessage" class="alert alert-danger my-4 text-center">
-            {{ errorMessage }}
-        </div>
-
         <!-- Cards -->
-        <div v-else class="row row-cols-12 justify-content-evenly">
-            <div v-for="janij in janijim" :key="janij.id" class="card p-2 col-12 col-md-5 col-lg-5 g-1 mb-2">
+        <div v-else class="row justify-content-between">
+            <div v-for="janij in janijim" :key="janij.id" class="card p-2 col mb-2 mx-2" @click="abrirDetalles(janij)">
                 <Janij :janij="janij" />
             </div>
         </div>
     </main>
 
     <!-- Modal JanijForm -->
-    <div v-if="showModal" class="modal-slide">
-        <div class="modal-content">
-            <button class="btn btn-close close-btn" @click="showModal = false" aria-label="Cerrar"></button>
-            <JanijForm />
+    <Transition name="modal-slide">
+        <div v-if="showModal" class="modal-slide">
+            <div class="modal-content">
+                <button class="btn btn-close close-btn" @click="showModal = false" aria-label="Cerrar"></button>
+                <JanijForm />
+            </div>
+            <div class="modal-backdrop" @click="showModal = false"></div>
         </div>
-        <div class="modal-backdrop" @click="showModal = false"></div>
-    </div>
+    </Transition>
+
+    <!-- Modal JanijDetails -->
+    <Transition name="modal-slide">
+        <div v-if="showDetails" class="modal-slide">
+            <div class="modal-content">
+                <button class="btn btn-close close-btn" @click="cerrarDetalles" aria-label="Cerrar"></button>
+                <JanijDetails :janij="janijSeleccionado" />
+            </div>
+            <div class="modal-backdrop" @click="cerrarDetalles"></div>
+        </div>
+    </Transition>
 </template>
 
 <script setup>
 import { useSupabase } from "../services/supabase"
+import { checkAuth } from "../services/useAuthCheck"
 const { supabase } = useSupabase();
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import Janij from "../components/Janij.vue"
 import JanijForm from "@/components/JanijForm.vue"
+import JanijDetails from "@/components/JanijDetails.vue"
 
 const janijim = ref([])
 const loading = ref(true)
 const errorMessage = ref("")
 const showModal = ref(false)
+const showDetails = ref(false)
+const janijSeleccionado = ref(null)
+const isLoggedIn = ref(false) // <-- nuevo
 
 onMounted(async () => {
+    const loggedIn = await checkAuth()
+    isLoggedIn.value = loggedIn
+
+    if (!loggedIn) {
+        errorMessage.value = "⚠️ Debes iniciar sesión para ver los janijim."
+        loading.value = false
+        return
+    }
+
     try {
         const { data, error } = await supabase
-            .from('Janijim')
-            .select('*');
-        console.log(data)
-        console.log(error)
+            .from("Janijim")
+            .select("* ORDER BY kvutza")
         if (error) throw error
         janijim.value = data
     } catch (err) {
-        console.error("Error cargando janijim:", err.message)
         errorMessage.value = "No se pudieron cargar los janijim."
     } finally {
         loading.value = false
     }
 })
+
+
+function abrirDetalles(janij) {
+    janijSeleccionado.value = { ...janij }
+    showDetails.value = true
+}
+
+function cerrarDetalles() {
+    showDetails.value = false
+    janijSeleccionado.value = null
+}
+
+function handleEsc(event) {
+    if (event.key === "Escape" && showDetails.value) {
+        cerrarDetalles()
+    }
+}
+
+watch(showDetails, (visible) => {
+    if (visible) {
+        window.addEventListener("keydown", handleEsc)
+    } else {
+        window.removeEventListener("keydown", handleEsc)
+    }
+})
 </script>
 
 <style scoped>
+/* Transición para el modal */
+.modal-slide-enter-active,
+.modal-slide-leave-active {
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.modal-slide-enter-from,
+.modal-slide-leave-to {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.modal-slide-enter-to,
+.modal-slide-leave-from {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Responsive: animación vertical */
+@media (max-width: 991.98px) {
+
+    .modal-slide-enter-from,
+    .modal-slide-leave-to {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+
+    .modal-slide-enter-to,
+    .modal-slide-leave-from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .modal-slide {
     position: fixed;
     top: 0;
@@ -156,9 +243,9 @@ onMounted(async () => {
     position: fixed;
     top: 0;
     left: 0;
-    width: 50vw;
+    width: 50vw !important;
     height: 100vh;
     background: rgba(0, 0, 0, 0.2);
-    z-index: 1049;
+    z-index: 900;
 }
 </style>

@@ -1,0 +1,243 @@
+<template>
+    <div>
+        <form v-if="editable" @submit.prevent="guardarCambios" class="border rounded bg-light container p-4">
+            <!-- DATOS DEL JANIJ -->
+            <h4 class="mb-3">Datos del Janij</h4>
+            <div class="row mb-3">
+                <div class="col-md-6 col-sm-12">
+                    <label for="name" class="form-label">Nombre</label>
+                    <input type="text" id="name" v-model="janij.name" class="form-control" required />
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <label for="lastname" class="form-label">Apellido</label>
+                    <input type="text" id="lastname" v-model="janij.lastname" class="form-control" required />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-md-6 col-sm-12">
+                    <label for="birthdate" class="form-label">Fecha de nacimiento</label>
+                    <input type="date" id="birthdate" v-model="janij.birthdate" class="form-control" required />
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <label for="kvutza" class="form-label">Kvutza</label>
+                    <select id="kvutza" v-model="janij.kvutza" class="form-select" required>
+                        <option value="Shigaón">Shigaón</option>
+                        <option value="Kosmim">Kosmim</option>
+                        <option value="Metukim">Metukim</option>
+                        <option value="Guiborim">Guiborim</option>
+                        <option value="Nedarim">Nedarim</option>
+                        <option value="Jajamim">Jajamim</option>
+                        <option value="Amitzim">Amitzim</option>
+                        <option value="Alufim">Alufim</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6 col-sm-12">
+                    <label for="janij_cellphone" class="form-label">Teléfono del janij</label>
+                    <input type="text" id="janij_cellphone" v-model="janij.janij_cellphone" class="form-control" />
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <label for="janij_address" class="form-label">Dirección</label>
+                    <input type="text" id="janij_address" v-model="janij.janij_address" class="form-control" required />
+                </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col-12">
+                    <label for="pic">Foto del Janij</label>
+                    <input type="file" id="pic" @change="handlePicChange" class="form-control" />
+                </div>
+            </div>
+
+            <!-- DATOS DE LOS PADRES -->
+            <h4 class="mb-3">Datos de los tutores</h4>
+            <div class="mb-3 row">
+                <div class="col-md-6 col-sm-12">
+                    <label for="parent_name" class="form-label">Nombre tutor 1</label>
+                    <input type="text" id="parent_name" v-model="janij.parent_name" class="form-control" />
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <label for="parent_cellphone" class="form-label">Teléfono tutor 1</label>
+                    <input type="text" id="parent_cellphone" v-model="janij.parent_cellphone" class="form-control" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-md-6 col-sm-12">
+                    <label for="parent2_name" class="form-label">Nombre tutor 2</label>
+                    <input type="text" id="parent2_name" v-model="janij.parent2_name" class="form-control" />
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <label for="parent2_cellphone" class="form-label">Teléfono tutor 2</label>
+                    <input type="text" id="parent2_cellphone" v-model="janij.parent2_cellphone" class="form-control" />
+
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary col-12 mt-4">Subir</button>
+        </form>
+
+        <div v-else class="p-4">
+            <h4 class="mb-3">Detalles del Janij</h4>
+            <p><strong>Nombre:</strong> {{ janij.name }}</p>
+            <p><strong>Apellido:</strong> {{ janij.lastname }}</p>
+            <p><strong>Fecha de nacimiento:</strong> {{ formatDate(janij.birthdate) }}</p>
+            <p><strong>Kvutza:</strong> {{ janij.kvutza }}</p>
+            <p>
+                <strong>Teléfono del janij:</strong>
+                <a v-if="janij.janij_cellphone" :href="waLink(janij.janij_cellphone)" target="_blank">
+                    {{ janij.janij_cellphone }}
+                </a>
+                <span v-else>-</span>
+            </p>
+            <p><strong>Dirección:</strong> {{ janij.janij_address }}</p>
+            <p><strong>Nombre tutor 1:</strong> {{ janij.parent_name }}</p>
+            <p>
+                <strong>Teléfono tutor 1:</strong>
+                <a v-if="janij.parent_cellphone" :href="waLink(janij.parent_cellphone)" target="_blank">
+                    {{ janij.parent_cellphone }}
+                </a>
+                <span v-else>-</span>
+            </p>
+            <p><strong>Nombre tutor 2:</strong> {{ janij.parent2_name }}</p>
+            <p>
+                <strong>Teléfono tutor 2:</strong>
+                <a v-if="janij.parent2_cellphone" :href="waLink(janij.parent2_cellphone)" target="_blank">
+                    {{ janij.parent2_cellphone }}
+                </a>
+                <span v-else>-</span>
+            </p>
+
+            <!-- Botones -->
+            <button class="btn btn-primary col-12 mt-4" @click="editar">Editar</button>
+            <!-- Botón -->
+            <button class="btn btn-danger col-12 mt-2" @click="showDeleteModal = true">
+                Eliminar
+            </button>
+
+            <!-- Modal Eliminar -->
+            <div v-if="showDeleteModal" class="modal fade show d-block" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirmar eliminación</h5>
+                            <button type="button" class="btn-close" @click="showDeleteModal = false"></button>
+                        </div>
+                        <div class="modal-body">
+                            ¿Estás seguro de que deseas eliminar a
+                            <strong>{{ janij.name }} {{ janij.lastname }}</strong>?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="showDeleteModal = false">
+                                Cancelar
+                            </button>
+                            <button type="button" class="btn btn-danger" @click="eliminarJanij">
+                                Sí, eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import { useSupabase } from "../services/supabase"
+const { supabase } = useSupabase();
+
+
+export default {
+    props: ['janij'],
+    data() {
+        return {
+            editable: false,
+            localJanij: { ...this.janij },
+            guardando: false,
+            showDeleteModal: false
+        }
+    },
+    watch: {
+        janij: {
+            handler(newVal) {
+                this.localJanij = { ...newVal }
+            },
+            deep: true
+        }
+    },
+    methods: {
+        editar() {
+            this.editable = true
+        },
+        async guardarCambios() {
+            this.guardando = true;
+            try {
+                // Normaliza la fecha a YYYY-MM-DD
+                if (this.localJanij.birthdate) {
+                    if (/^\d{2}\/\d{2}\/\d{4}$/.test(this.localJanij.birthdate)) {
+                        const [dd, mm, yyyy] = this.localJanij.birthdate.split('/');
+                        this.localJanij.birthdate = `${yyyy}-${mm}-${dd}`;
+                    }
+                }
+
+                const { error } = await supabase
+                    .from('Janijim')
+                    .update(this.localJanij)
+                    .eq('id', this.localJanij.id);
+
+                if (error) throw error;
+
+                Object.assign(this.janij, this.localJanij);
+                this.editable = false;
+                alert("Cambios guardados correctamente");
+                window.location.reload();
+            } catch (err) {
+                alert("Error al guardar los cambios");
+            } finally {
+                this.guardando = false;
+            }
+        },
+        async eliminarJanij() {
+            try {
+                const { error } = await supabase
+                    .from('Janijim')
+                    .delete()
+                    .eq('id', this.janij.id);
+
+                if (error) throw error;
+
+                alert("Janij eliminado correctamente");
+                window.location.reload();
+            } catch (err) {
+                alert("Error al eliminar el janij");
+            } finally {
+                this.showDeleteModal = false;
+            }
+        },
+        waLink(number) {
+            const clean = String(number).replace(/\D/g, "");
+            return `https://wa.me/54${clean}`;
+        },
+        formatDate(dateStr) {
+            if (!dateStr) return "-";
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                const [yyyy, mm, dd] = dateStr.split('-');
+                return `${dd}/${mm}/${yyyy}`;
+            }
+            const d = new Date(dateStr);
+            if (!isNaN(d)) {
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                return `${dd}/${mm}/${yyyy}`;
+            }
+            return dateStr;
+        }
+    }
+}
+</script>
+
+<style scoped>
+#deleteModal .modal-content {
+    z-index: 3000;
+}
+</style>

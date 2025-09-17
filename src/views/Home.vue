@@ -7,7 +7,7 @@
             <div id="greeting"
                 class="col-12 mb-4 text-center text-white d-flex flex-column justify-content-center align-items-center">
                 <h1 v-if="loading">Cargando...</h1>
-                <h1 v-else-if="error" class="modal" tabindex="-1">Bienvenido a Madrijapp</h1>
+                <h1 v-else-if="error">Bienvenido a Madrijapp</h1>
                 <h1 v-else>Hola, {{ profile.name }}</h1>
             </div>
         </section>
@@ -100,7 +100,7 @@ onMounted(async () => {
 <style scoped>
 #banner {
     position: relative;
-    background-image: url('../../public/img/Banner.jpg');
+    background-image: url('/img/Banner.jpg');
     background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
@@ -129,6 +129,12 @@ onMounted(async () => {
 #banner>* {
     position: relative;
     z-index: 2;
+}
+
+#greeting>h1 {
+    text-shadow: 2px 2px 5px rgb(1, 0, 22);
+    font-size: 3rem;
+    font-weight: bold;
 }
 
 .igwrapper {

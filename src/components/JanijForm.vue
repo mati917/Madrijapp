@@ -148,6 +148,7 @@ export default {
                 };
                 this.picFile = null;
                 document.getElementById("pic").value = "";
+                window.location.reload();
             } catch (error) {
                 console.error(error);
                 alert("Hubo un error al guardar el registro");
