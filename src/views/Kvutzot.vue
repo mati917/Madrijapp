@@ -128,6 +128,8 @@ async function refreshKvutzot() {
 
 
 <style scoped>
+@import url(../assets/css/main.css);
+
 #actioncol {
     width: 10%;
 }

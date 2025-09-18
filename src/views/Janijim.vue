@@ -21,9 +21,10 @@
         </div>
 
         <!-- Cards -->
-        <div v-else class="row justify-content-between">
-            <div v-for="janij in janijim" :key="janij.id" class="card p-2 col mb-2 mx-2" @click="abrirDetalles(janij)">
-                <Janij :janij="janij" />
+        <div v-else class="row justify-content-between g-2">
+            <div v-for="janij in janijim" :key="janij.id" class="card p-2 col-12 col-md-6 col-lg-4 hover-effect"
+                @click="abrirDetalles(janij)">
+                <Janij :janij="janij" :kvutzot="kvutzot" />
             </div>
         </div>
     </main>
@@ -54,19 +55,20 @@
 <script setup>
 import { useSupabase } from "../services/supabase"
 import { checkAuth } from "../services/useAuthCheck"
-const { supabase } = useSupabase();
 import { ref, onMounted, watch } from "vue"
 import Janij from "../components/Janij.vue"
 import JanijForm from "@/components/JanijForm.vue"
 import JanijDetails from "@/components/JanijDetails.vue"
 
+const { supabase } = useSupabase();
 const janijim = ref([])
+const kvutzot = ref([])
 const loading = ref(true)
 const errorMessage = ref("")
 const showModal = ref(false)
 const showDetails = ref(false)
 const janijSeleccionado = ref(null)
-const isLoggedIn = ref(false) // <-- nuevo
+const isLoggedIn = ref(false)
 
 onMounted(async () => {
     const loggedIn = await checkAuth()
@@ -79,18 +81,35 @@ onMounted(async () => {
     }
 
     try {
+        // Traer kvutzot
+        const { data: kvData, error: kvError } = await supabase
+            .from("Kvutzot")
+            .select("id_kvutza, name")
+        if (kvError) throw kvError
+        kvutzot.value = kvData
+
+        // Traer janijim
         const { data, error } = await supabase
             .from("Janijim")
-            .select("* ORDER BY kvutza")
+            .select("*")
+            .order("kvutza", { ascending: true })
         if (error) throw error
         janijim.value = data
+
+        // Reemplazar id_kvutza por name para mostrar
+        janijim.value = janijim.value.map(j => {
+            const kv = kvutzot.value.find(k => k.id_kvutza === j.kvutza)
+            return { ...j, kvutzaName: kv ? kv.name : j.kvutza }
+        })
+
+
     } catch (err) {
+        console.error(err)
         errorMessage.value = "No se pudieron cargar los janijim."
     } finally {
         loading.value = false
     }
 })
-
 
 function abrirDetalles(janij) {
     janijSeleccionado.value = { ...janij }
@@ -117,7 +136,10 @@ watch(showDetails, (visible) => {
 })
 </script>
 
+
 <style scoped>
+@import url(../assets/css/main.css);
+
 /* Transición para el modal */
 .modal-slide-enter-active,
 .modal-slide-leave-active {
@@ -183,7 +205,7 @@ watch(showDetails, (visible) => {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    z-index: 2;
+    z-index: 1000;
 }
 
 /* Responsive modal for md and below */
@@ -243,7 +265,7 @@ watch(showDetails, (visible) => {
     position: fixed;
     top: 0;
     left: 0;
-    width: 50vw !important;
+    width: 50vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.2);
     z-index: 900;

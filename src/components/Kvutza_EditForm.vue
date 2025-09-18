@@ -50,6 +50,7 @@
                 <option value="Atid">Atid</option>
                 <option value="Jana Szenes">Jana Szenes</option>
                 <option value="Tzevet">Tzevet</option>
+                <option value="Ex Bogrim">Ex Bogrim</option>
             </select>
             <div class="invalid-feedback">Este campo es obligatorio.</div>
         </div>

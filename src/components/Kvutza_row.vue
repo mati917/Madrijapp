@@ -1,5 +1,5 @@
 <template>
-    <tr>
+    <tr class="hover-effect align-middle">
         <td class="d-flex gap-2 justify-content-center">
             <button class="btn btn-sm btn-outline-primary" @click="$emit('edit-kvutza', kvutza)">
                 <i class="bi bi-pencil-square"></i>
