@@ -17,7 +17,7 @@ export async function signUp({
 
   const user = data.user
 
-  // 2. Insertar perfil en tabla usuarios
+  // 2. Insertar perfil en tabla Bogrim, incluyendo el email
   const { error: dbError } = await supabase.from('Bogrim').insert([
     {
       id_auth: user.id,
@@ -27,6 +27,7 @@ export async function signUp({
       kvutza,
       celular,
       nacimiento,
+      email, // ✅ Guardamos email también en Bogrim
     },
   ])
 

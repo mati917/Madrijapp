@@ -7,6 +7,7 @@ import Perfil from '@/views/Perfil.vue'
 import Kvutzot from '@/views/Kvutzot.vue'
 import Tzevet from '@/views/Tzevet.vue'
 import Boguer from '@/views/Boguer.vue'
+import Roles from '@/views/Roles.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,7 +19,7 @@ const router = createRouter({
     },
     {
       path: '/janijim',
-      name: 'Janijim',
+      name: 'janijim',
       component: Janijim,
     },
     {
@@ -33,23 +34,33 @@ const router = createRouter({
     },
     {
       path: '/perfil',
-      name: 'Perfil',
+      name: 'perfil',
       component: Perfil,
     },
     {
       path: '/kvutzot',
-      name: 'Kvutzot',
+      name: 'kvutzot',
       component: Kvutzot,
     },
     {
       path: '/tzevet',
-      name: 'Tzevet',
+      name: 'tzevet',
       component: Tzevet,
     },
     {
       path: '/boguer',
       name: 'boguer',
       component: Boguer,
+    },
+    {
+      path: '/boguer/:dni', // <-- parámetro dinámico
+      name: 'boguer',
+      component: Boguer,
+    },
+    {
+      path: '/roles',
+      name: 'roles',
+      component: Roles,
     },
   ],
 })

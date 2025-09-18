@@ -31,12 +31,9 @@
                             <label for="kvutza">Kvutzá</label>
                             <select v-model="kvutza" class="form-select" id="kvutza" :class="inputClass('kvutza')"
                                 required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="Meiujad">Meiujad</option>
-                                <option value="Atzumim">Atzumim</option>
-                                <option value="Balagan">Balagán</option>
-                                <option value="Jalutzim">Jalutzim</option>
-                                <option value="Melajim">Melajim</option>
+                                <option v-for="kv in kvutzot" :key="kv.id_kvutza" :value="kv.id_kvutza">
+                                    {{ kv.name }}
+                                </option>
                             </select>
                             <div v-if="errors.kvutza" class="invalid-feedback">{{ errors.kvutza }}</div>
                         </div>
@@ -96,10 +93,12 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
+import { useSupabase } from "../services/supabase"
 import { signUp } from "../services/auth"
 import { useRouter } from "vue-router"
 const router = useRouter()
+const { supabase } = useSupabase()
 
 // Campos del formulario
 const nombre = ref("")
@@ -155,6 +154,19 @@ function formateDate(date) {
 
     return [year, month, day].join('-');
 }
+const kvutzot = ref([])
+
+onMounted(async () => {
+    const { data, error } = await supabase
+        .from("Kvutzot")
+        .select("id_kvutza, name")
+        .or("ken.eq.Tzevet,shijva.eq.Tzofim")
+        .order("id_kvutza")
+
+    if (error) console.error(error)
+    else kvutzot.value = data
+})
+
 
 const handleSignUp = async () => {
     errorMsg.value = null

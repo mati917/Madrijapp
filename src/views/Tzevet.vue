@@ -42,6 +42,8 @@
                             <th scope="col" class="bg-primary bg-opacity-10">Kvutzá</th>
                             <th scope="col" class="bg-primary bg-opacity-10">Celular</th>
                             <th scope="col" class="bg-primary bg-opacity-10">Nacimiento</th>
+                            <th scope="col" class="bg-primary bg-opacity-10">Tafkidim</th>
+                            <th scope="col" class="bg-primary bg-opacity-10">Roles</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,6 +54,7 @@
                             <td>{{ bogrim.kvutza }}</td>
                             <td> <a :href="walink(bogrim.celular)" target="_blank">{{ bogrim.celular }}</a></td>
                             <td>{{ formatDate(bogrim.nacimiento, 'DD/MM/YYYY') }}</td>
+                            <td>{{ bogrim.tafkidim.join(', ') }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -102,7 +105,7 @@ onMounted(async () => {
         // Cargar Bogrim del Tzevet
         const { data: bogData, error: bogError } = await supabase
             .from("Bogrim")
-            .select("name, lastname, dni, kvutza, celular, nacimiento")
+            .select("*")
             .order("kvutza", { ascending: true })
 
         if (bogError) throw bogError
