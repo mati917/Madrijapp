@@ -1,18 +1,17 @@
 <template>
     <div class="container">
-        <div id="headering" class="bg-primary bg-opacity-25 text-primary p-3 my-4 rounded row">
-            <h1 class="col-10">Kvutzot</h1>
+        <Titulo titulo="Kvutzot">
             <button v-if="isLoggedIn" type="button" class="btn btn-outline-primary col-2" @click="showModal = true">
                 Añadir
             </button>
-        </div>
+        </Titulo>
 
         <!-- Mensajes -->
         <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
         <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
         <!-- Tabla -->
-        <main v-else class="row">
+        <main v-else-if="can(['ADM', 'HNG', 'MZK', 'JNJ'])" class="row">
             <table class="table">
                 <thead>
                     <tr>
@@ -29,6 +28,8 @@
                 </tbody>
             </table>
         </main>
+        <div v-else class="alert alert-danger row">No tienes los permisos para ver esto.<br />Comunicate con tu
+            referente</div>
 
         <!-- Modal Añadir Kvutza -->
         <transition name="modal-slide">
@@ -58,17 +59,21 @@
 import { ref, onMounted } from "vue"
 import { useSupabase } from "../services/supabase"
 import { checkAuth } from "../services/useAuthCheck"
+import { useAuthRoles } from "@/services/useAuthRoles"
 import Kvutza_row from "../components/Kvutza_row.vue"
 import KvutzaForm from "../components/Kvutza_Form.vue"
 import KvutzaEditForm from "../components/Kvutza_EditForm.vue"
+import Titulo from "@/components/Titulo.vue"
 
 const { supabase } = useSupabase()
+const { roles, loadUserRoles, can } = useAuthRoles()
 const errorMessage = ref("")
 const successMessage = ref("")
 const kvutzot = ref([])
 const showModal = ref(false)
 const editingKvutza = ref(null)
 const isLoggedIn = ref(false)
+
 
 onMounted(async () => {
     const loggedIn = await checkAuth()
@@ -78,8 +83,9 @@ onMounted(async () => {
         errorMessage.value = "⚠️ Debes iniciar sesión para ver las kvutzot."
         return
     }
+    await loadUserRoles();
+    await fetchKvutzot();
 
-    await fetchKvutzot()
 })
 
 async function fetchKvutzot() {
@@ -181,7 +187,7 @@ async function refreshKvutzot() {
 }
 
 .modal-content {
-    width: 50vw;
+    width: 50%;
     max-width: 50vw;
     height: 100%;
     padding: 0;
@@ -197,6 +203,17 @@ async function refreshKvutzot() {
 
 .modal-content>form {
     height: 100%;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    max-width: 50vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 900;
 }
 
 .close-btn {
@@ -257,15 +274,5 @@ async function refreshKvutzot() {
     to {
         transform: translateY(0);
     }
-}
-
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 50vw !important;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.2);
-    z-index: 900;
 }
 </style>

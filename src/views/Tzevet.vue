@@ -1,12 +1,10 @@
 <template>
     <div class="container my-4">
-        <div id="headering" class="bg-primary bg-opacity-25 text-primary p-3 my-4 rounded row">
-            <h1>Tzevet</h1>
-        </div>
+        <Titulo titulo="Tzevet" />
 
         <!-- Mensajes -->
         <div v-if="errorMessage" class="alert alert-danger row">{{ errorMessage }}</div>
-        <div v-else id="Correct">
+        <div v-else-if="can(['ADM', 'HNG', 'MZK'])" id="Correct">
             <!-- Sección Kvutzot -->
             <section id="section-kvutzot" class="section mb-4">
                 <h2 class="mb-4 text-primary my-3 border-bottom border-primary">Kvutzot del tzevet</h2>
@@ -47,7 +45,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="bogrim in bogrimTzevet" :key="bogrim.dni" class="align-middle hover-effect">
+                        <tr v-for="bogrim in bogrimTzevet" :key="bogrim.dni" class="align-middle hover-effect"
+                            @dblclick="goToBoguer(bogrim)" style="cursor: pointer;">
                             <td>{{ bogrim.name }}</td>
                             <td>{{ bogrim.lastname }}</td>
                             <td>{{ bogrim.dni }}</td>
@@ -55,22 +54,32 @@
                             <td> <a :href="walink(bogrim.celular)" target="_blank">{{ bogrim.celular }}</a></td>
                             <td>{{ formatDate(bogrim.nacimiento, 'DD/MM/YYYY') }}</td>
                             <td>{{ bogrim.tafkidim.join(', ') }}</td>
+                            <td>{{ bogrim.roles.join(', ') }}</td>
                         </tr>
                     </tbody>
                 </table>
             </section>
         </div>
+        <div v-else class="alert alert-danger row">No tienes los permisos para ver esto.<br />Comunicate con tu
+            referente</div>
+
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue"
+import { useRouter } from "vue-router"
 import { useSupabase } from "../services/supabase"
 import { checkAuth } from "../services/useAuthCheck"
+import { useAuthRoles } from "@/services/useAuthRoles"
 import { formatDate } from "../services/formats"
 import { walink } from "../services/walink"
+import Titulo from "@/components/Titulo.vue"
 
+
+const router = useRouter()
 const { supabase } = useSupabase()
+const { roles, loadUserRoles, can } = useAuthRoles()
 const kvutzotTzevet = ref([])
 const bogrimTzevet = ref([])
 const errorMessage = ref("")
@@ -84,6 +93,7 @@ onMounted(async () => {
         errorMessage.value = "⚠️ Debes iniciar sesión para ver esta página."
         return
     }
+    await loadUserRoles();
 
     try {
         // Cargar Kvutzot del Tzevet
@@ -121,6 +131,11 @@ onMounted(async () => {
         errorMessage.value = "❌ Error cargando datos del Tzevet: " + err.message
     }
 })
+
+function goToBoguer(boguer) {
+    router.push('/boguer/' + boguer.dni)
+}
+
 </script>
 
 

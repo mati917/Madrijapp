@@ -1,14 +1,13 @@
 <template>
     <main class="container p-3">
-        <div id="headering" class="bg-primary bg-opacity-25 text-primary p-3 mb-4 rounded row">
-            <h1 class="col-10">Janijim</h1>
-
+        <Titulo titulo="Janijim">
             <!-- Botón visible solo si hay sesión -->
-            <button v-if="isLoggedIn" type="button" id="add-janij" class="btn btn-outline-primary col-2"
+            <button v-if="isLoggedIn" type="button" id="add-janij" class="btn btn-outline-primary col-3 col-md-2"
                 @click="showModal = true">
                 Añadir
             </button>
-        </div>
+        </Titulo>
+
 
         <!-- Error -->
         <div v-if="errorMessage" class="alert alert-danger row" role="alert">
@@ -53,14 +52,18 @@
 </template>
 
 <script setup>
+import { ref, onMounted, watch } from "vue"
 import { useSupabase } from "../services/supabase"
 import { checkAuth } from "../services/useAuthCheck"
-import { ref, onMounted, watch } from "vue"
+import { useAuthRoles } from "@/services/useAuthRoles"
+import Titulo from "@/components/Titulo.vue"
 import Janij from "../components/Janij.vue"
 import JanijForm from "@/components/JanijForm.vue"
 import JanijDetails from "@/components/JanijDetails.vue"
 
+
 const { supabase } = useSupabase();
+const { roles, loadUserRoles, can } = useAuthRoles()
 const janijim = ref([])
 const kvutzot = ref([])
 const loading = ref(true)
@@ -79,6 +82,8 @@ onMounted(async () => {
         loading.value = false
         return
     }
+    await loadUserRoles();
+
 
     try {
         // Traer kvutzot

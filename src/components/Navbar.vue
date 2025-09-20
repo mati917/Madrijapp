@@ -17,7 +17,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/janijim">Janijim</a>
                         </li>
-                        <li class="nav-item dropdown">
+                        <li v-if="can(['ADM', 'HNG', 'MZK', 'HDR'])" class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
                                 Harjavá
@@ -31,13 +31,13 @@
                                 <li><a class="dropdown-item" href="#">Métricas</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled" aria-disabled="true">Mi Hadrajá</a>
+                        <li v-if="can(['ADM', 'HDR', 'JNJ'])" class="nav-item">
+                            <a class="nav-link">Mi Hadrajá</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" aria-disabled="true">Eventos</a>
+                            <a class="nav-link">Eventos</a>
                         </li>
-                        <li class="nav-item dropdown">
+                        <li v-if="can('ADM', 'HNG', 'MZK', 'JNJ')" class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
                                 Admin
@@ -64,5 +64,13 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import Navbar_UserBtn from './Navbar_UserBtn.vue'
+import { useAuthRoles } from '@/services/useAuthRoles';
+const { roles, loadUserRoles, can } = useAuthRoles()
+
+onMounted(async () => {
+    await loadUserRoles();
+})
+
 </script>

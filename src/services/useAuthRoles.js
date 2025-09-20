@@ -7,7 +7,6 @@
         const { roles, loadUserRoles, can } = useAuthRoles()
 
         onMounted(() => {
-        loadUserRoles()
         })
 2. 
     <div v-if="can(['rosh','madrij'])">

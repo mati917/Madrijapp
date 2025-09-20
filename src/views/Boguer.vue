@@ -1,8 +1,7 @@
 <template>
     <div class="container my-5">
-        <div id="headering" class="bg-primary bg-opacity-25 text-primary p-3 my-4 rounded row">
-            <h1>Boguer</h1>
-        </div>
+        <Titulo titulo="Boguer" />
+
 
         <div v-if="loading">Cargando perfil del boguer...</div>
         <div v-else-if="error" class="alert alert-danger row">{{ error }}</div>
@@ -20,10 +19,17 @@
                         <h5 class="card-title">{{ profile.name }} {{ profile.lastname }}</h5>
                         <h6 class="card-subtitle mb-2 text-body-secondary">{{ kvutzaName }}</h6>
                         <p class="card-text"><strong>DNI:</strong> {{ profile.dni }}</p>
-                        <p class="card-text"><strong>Celular:</strong> {{ profile.celular }}</p>
+                        <p class="card-text"><strong>Celular:</strong> <a :href="walink(profile.celular)">{{
+                            profile.celular }}</a></p>
                         <p class="card-text"><strong>Fecha de nacimiento:</strong> {{ formatDate(profile.nacimiento,
                             'DD/MM/YYYY') }}</p>
-                        <p class="card-text"><strong>Email:</strong> {{ profile.email }}</p>
+                        <p class="card-text"><strong>Email:</strong> <a :href="'mailto:' + profile.email">{{
+                            profile.email
+                                }}</a></p>
+                        <p class="card-text"><strong>Tafkidim:</strong> {{ profile.tafkidim.join(', ') }}</p>
+                        <p v-if="can('ADM', 'HNG', 'MZK')">
+                            <strong>Roles: </strong>{{ profile.roles.join(', ') }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -36,13 +42,17 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue"
+import { useRoute } from "vue-router"
 import { useSupabase } from '../services/supabase'
 import { checkAuth } from "@/services/useAuthCheck"
-import { useRoute } from "vue-router"
+import { useAuthRoles } from "@/services/useAuthRoles"
 import { formatDate } from "@/services/formats"
+import { walink } from "@/services/walink"
+import Titulo from "@/components/Titulo.vue"
 
 const { supabase } = useSupabase()
 const route = useRoute()
+const { roles, loadUserRoles, can } = useAuthRoles()
 
 const profile = ref(null)
 const kvutzot = ref([]) // tabla de kvutzot
@@ -73,6 +83,8 @@ onMounted(async () => {
         error.value = "⚠️ Debes iniciar sesión para ver esta página."
         return
     }
+    await loadUserRoles();
+
     const dni = route.params.dni
     if (!dni) {
         error.value = "No se proporcionó DNI"

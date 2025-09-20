@@ -1,6 +1,6 @@
 <template>
     <form ref="formRef" @submit.prevent="handleSubmit" :class="{ 'was-validated': validated }" novalidate
-        class="p-4 border rounded bg-light container">
+        class="p-5 border rounded bg-light container">
         <h4 class="mb-3">Editar Kvutzá</h4>
 
         <!-- ID Kvutza (solo lectura) -->

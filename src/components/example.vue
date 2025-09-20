@@ -9,7 +9,8 @@
             <main class="row">
             </main>
         </div>
-        <div v-else class="alert alert-danger row">No tienes los permisos para ver esto.</div>
+        <div v-else class="alert alert-danger row">No tienes los permisos para ver esto.<br />Comunicate con tu
+            referente</div>
     </div>
 </template>
 
@@ -26,6 +27,7 @@ const { supabase } = useSupabase()
 const { roles, loadUserRoles, can } = useAuthRoles()
 
 onMounted(async () => {
+    // Chequeo usuario
     const loggedIn = await checkAuth()
     isLoggedIn.value = loggedIn
 

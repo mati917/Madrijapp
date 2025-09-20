@@ -1,8 +1,6 @@
 <template>
     <div class="container-md my-4">
-        <div id="headering" class="bg-primary bg-opacity-25 text-primary p-3 my-4 rounded row">
-            <h1>Roles</h1>
-        </div>
+        <Titulo titulo="Roles" />
         <!-- Error -->
         <div v-if="errorMessage" class="alert alert-danger row">{{ errorMessage }}</div>
         <div v-else-if="can(['ADM', 'HNG', 'MZK'])">
@@ -17,17 +15,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
+                        <tr v-for="rol in rols">
+                            <th scope="row">{{ rol.id }}</th>
+                            <td>{{ rol.name }}</td>
+                            <td>{{ rol.alias }}</td>
+                            <td>{{ rol.description }}</td>
                         </tr>
                     </tbody>
                 </table>
             </main>
         </div>
-        <div v-else class="alert alert-danger row">No tienes los permisos para ver esto.</div>
+        <div v-else class="alert alert-danger row">No tienes los permisos para ver esto.<br />Comunicate con tu
+            referente</div>
 
     </div>
 </template>
@@ -37,13 +36,18 @@ import { ref, onMounted } from "vue"
 import { useSupabase } from '@/services/supabase';
 import { checkAuth } from "@/services/useAuthCheck"
 import { useAuthRoles } from "@/services/useAuthRoles"
+import Titulo from "@/components/Titulo.vue"
+
 
 const errorMessage = ref("")
 const isLoggedIn = ref(false)
 const { supabase } = useSupabase()
 const { roles, loadUserRoles, can } = useAuthRoles()
 
+const rols = ref([])
+
 onMounted(async () => {
+    // Chequeo de usuario
     const loggedIn = await checkAuth()
     isLoggedIn.value = loggedIn
 
@@ -52,7 +56,20 @@ onMounted(async () => {
         return
     }
 
-    await loadUserRoles() // 👈 espera a que se llenen los roles
+    await loadUserRoles()
+
+    try {
+        const { data, error } = await supabase
+            .from("roles")
+            .select("*")
+            .order("id", { ascending: true })
+        if (error) throw error
+        rols.value = data
+    } catch (error) {
+        console.error(error)
+        errorMessage.value = "❌ Error cargando roles: " + error.message
+    }
+
 })
 
 
