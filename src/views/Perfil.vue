@@ -19,8 +19,8 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { useSupabase } from '../services/supabase'
-import { cargarKvutzot } from "@/services/kvutzaMapper"
-import { kvutzaMap } from "@/services/kvutzaMapper"
+import { cargarKvutzot } from "@/services/mapKvutza"
+import { kvutzaMap } from "@/services/mapKvutza"
 import { formatDate } from "@/services/formats"
 import Header from "@/components/Titulo.vue"
 import Titulo from "@/components/Titulo.vue"

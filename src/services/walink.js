@@ -1,3 +1,4 @@
 export function walink(number) {
-  return 'https:wa.me/54' + number
+  let clean = String(number).replace(/\D/g, '')
+  return 'https://wa.me/54' + clean
 }

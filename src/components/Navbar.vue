@@ -45,6 +45,7 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="/kvutzot">Kvutzot</a></li>
                                 <li><a class="dropdown-item" href="/tzevet">Tzevet</a></li>
+                                <li><a class="dropdown-item" href="/hadrajot">Hadrajot</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>

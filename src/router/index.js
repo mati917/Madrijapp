@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Janijim from '../views/Janijim.vue'
-import SignIn from '@/views/SignIn.vue'
 import Home from '@/views/Home.vue'
+import SignIn from '@/views/SignIn.vue'
 import SingUp from '@/views/SingUp.vue'
+import Roles from '@/views/Roles.vue'
 import Perfil from '@/views/Perfil.vue'
+import Janijim from '../views/Janijim.vue'
 import Kvutzot from '@/views/Kvutzot.vue'
 import Tzevet from '@/views/Tzevet.vue'
 import Boguer from '@/views/Boguer.vue'
-import Roles from '@/views/Roles.vue'
+import Hadrajot from '@/views/Hadrajot.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -61,6 +62,11 @@ const router = createRouter({
       path: '/roles',
       name: 'roles',
       component: Roles,
+    },
+    {
+      path: '/hadrajot',
+      name: 'hadrajot',
+      component: Hadrajot,
     },
   ],
 })

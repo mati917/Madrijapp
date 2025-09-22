@@ -45,7 +45,7 @@ export function useAuthRoles() {
     }
 
     roles.value = data?.roles || [] // 👈 evita null
-    console.log('Roles asignados en helper:', roles.value)
+    //console.log('Roles asignados en helper:', roles.value)
 
     currentUser.value = user
   }

@@ -26,7 +26,7 @@
 
             </div>
             <div class="col-md-6 col-sm-12">
-                <label for="kvutza" class="form-label">Kvutza</label>
+                <label for="kvutza" class="form-label">Kvutzá</label>
                 <select v-model="localJanij.kvutza" class="form-select" required>
                     <option disabled value="">Seleccione una kvutza</option>
                     <option v-for="kv in kvutzot" :key="kv.id_kvutza" :value="kv.id_kvutza">
@@ -102,7 +102,7 @@
         <p><strong>Kvutza:</strong> {{ kvutzaName }}</p>
         <p>
             <strong>Teléfono del janij: </strong>
-            <a v-if="janij.janij_cellphone" :href="waLink(janij.janij_cellphone)" target="_blank">
+            <a v-if="janij.janij_cellphone" :href="'https:/wa.me/54' + janij.janij_cellphone" target="_blank">
                 {{ janij.janij_cellphone }}
             </a>
             <span v-else>-</span>
@@ -112,7 +112,7 @@
         <p><strong>Nombre tutor 1:</strong> {{ janij.parent_name }}</p>
         <p>
             <strong>Teléfono tutor 1: </strong>
-            <a v-if="janij.parent_cellphone" :href="waLink(janij.parent_cellphone)" target="_blank">
+            <a v-if="janij.parent_cellphone" :href="'https:/wa.me/54' + janij.parent_cellphone" target="_blank">
                 {{ janij.parent_cellphone }}
             </a>
             <span v-else>-</span>
@@ -120,7 +120,7 @@
         <p><strong>Nombre tutor 2:</strong> {{ janij.parent2_name }}</p>
         <p>
             <strong>Teléfono tutor 2: </strong>
-            <a v-if="janij.parent2_cellphone" :href="waLink(janij.parent2_cellphone)" target="_blank">
+            <a v-if="janij.parent2_cellphone" :href="'https:/wa.me/54' + janij.parent2_cellphone" target="_blank">
                 {{ janij.parent2_cellphone }}
             </a>
             <span v-else>-</span>
@@ -287,11 +287,6 @@ export default {
             } finally {
                 this.showDeleteModal = false;
             }
-        },
-        // Genera un link de WhatsApp según número
-        waLink(number) {
-            const clean = String(number).replace(/\D/g, "");
-            return `https://wa.me/54${clean}`;
         },
         // Formatea las fechas
         formatDate(dateStr) {

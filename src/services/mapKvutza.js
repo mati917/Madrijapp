@@ -15,5 +15,5 @@ export async function cargarKvutzot() {
 
 // Función síncrona
 export function kvutzaMap(id) {
-  return kvutzaCache[id] || null
+  return kvutzaCache[id] || id
 }

@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="handleSubmit" class="p-4 border rounded bg-light container" novalidate>
+    <form @submit.prevent="handleSubmit" class="p-5 border rounded bg-light container" novalidate>
         <h4 class="mb-3">Datos de la Kvutza</h4>
 
         <!-- ID Kvutza -->
