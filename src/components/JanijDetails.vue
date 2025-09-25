@@ -23,7 +23,6 @@
                 <label for="birthdate" class="form-label">Fecha de nacimiento</label>
                 <input type="date" id="birthdate" v-model="janij.birthdate" class="form-control" required />
                 <div class="invalid-feedback">Debes llenar el campo</div>
-
             </div>
             <div class="col-md-6 col-sm-12">
                 <label for="kvutza" class="form-label">Kvutzá</label>
@@ -47,6 +46,10 @@
                 <input type="text" id="janij_address" v-model="janij.janij_address" class="form-control" required />
                 <div class="invalid-feedback">Debes llenar el campo</div>
             </div>
+            <div class="col-12">
+                <label class="form-label" for="janij_dni">DNI</label>
+                <input type="number" id="janij_dni" v-model="janij.dni" class="form-control">
+            </div>
         </div>
         <div class="row mb-5">
             <div class="col-12">
@@ -56,7 +59,7 @@
             <div class="col-12 mt-1">
                 <label class="form-label" for="janijtype">Tipo de janij</label>
                 <select name="janijtype" id="janijtype" v-model="janij.type_janij" class="form-select">
-                    <option disabled value="">Seleccione una kvutza</option>
+                    <option disabled value="">Seleccione un tipo</option>
                     <option value="Fijo">Fijo</option>
                     <option value="Rotativo">Rotativo</option>
                     <option value="Esporádico">Esporádico</option>
@@ -108,7 +111,8 @@
             <span v-else>-</span>
         </p>
         <p><strong>Tipo de janij: </strong>{{ janij.type_janij }}</p>
-        <p><strong>Dirección:</strong> {{ janij.janij_address }}</p>
+        <p><strong>DNI:</strong> {{ janij.janij_address }}</p>
+        <p><strong>Dirección:</strong> {{ janij.dni }}</p>
         <p><strong>Nombre tutor 1:</strong> {{ janij.parent_name }}</p>
         <p>
             <strong>Teléfono tutor 1: </strong>

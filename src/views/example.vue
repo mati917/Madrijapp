@@ -1,8 +1,6 @@
 <template>
     <div class="container-md my-4">
-        <div id="headering" class="bg-primary bg-opacity-25 text-primary p-3 my-4 rounded row">
-            <h1>Roles</h1>
-        </div>
+        <Titulo :titulo="Título"></Titulo>
         <!-- Error -->
         <div v-if="errorMessage" class="alert alert-danger row">{{ errorMessage }}</div>
         <div v-else-if="can(['ADM', 'HNG', 'MZK'])">
@@ -20,6 +18,8 @@ import { ref, onMounted } from "vue"
 import { useSupabase } from '@/services/supabase';
 import { checkAuth } from "@/services/useAuthCheck"
 import { useAuthRoles } from "@/services/useAuthRoles"
+import Titulo from "@/components/Titulo.vue";
+import Subtitulo from "@/components/Subtitulo.vue";
 
 const errorMessage = ref("")
 const isLoggedIn = ref(false)

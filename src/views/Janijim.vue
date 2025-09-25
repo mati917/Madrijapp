@@ -20,10 +20,11 @@
         </div>
 
         <!-- Cards -->
-        <div v-else class="row justify-content-between g-2">
-            <div v-for="janij in janijim" :key="janij.id" class="card p-2 col-12 col-md-6 col-lg-4 hover-effect"
-                @click="abrirDetalles(janij)">
-                <Janij :janij="janij" :kvutzot="kvutzot" />
+        <div v-else class="row g-4">
+            <div v-for="janij in janijim" :key="janij.id" class="col-12 col-md-6 col-lg-4">
+                <div class="card p-2 hover-effect" @click="abrirDetalles(janij)">
+                    <Janij :janij="janij" :kvutzot="kvutzot" />
+                </div>
             </div>
         </div>
     </main>
@@ -144,6 +145,10 @@ watch(showDetails, (visible) => {
 
 <style scoped>
 @import url(../assets/css/main.css);
+
+.card {
+    height: 9rem;
+}
 
 /* Transición para el modal */
 .modal-slide-enter-active,

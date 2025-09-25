@@ -32,7 +32,7 @@
                             </ul>
                         </li>
                         <li v-if="can(['ADM', 'HDR', 'JNJ'])" class="nav-item">
-                            <a class="nav-link">Mi Hadrajá</a>
+                            <a class="nav-link" href="/hadraja">Hadrajá</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link">Eventos</a>

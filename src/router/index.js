@@ -9,6 +9,7 @@ import Kvutzot from '@/views/Kvutzot.vue'
 import Tzevet from '@/views/Tzevet.vue'
 import Boguer from '@/views/Boguer.vue'
 import Hadrajot from '@/views/Hadrajot.vue'
+import Hadraja from '@/views/Hadraja.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -67,6 +68,11 @@ const router = createRouter({
       path: '/hadrajot',
       name: 'hadrajot',
       component: Hadrajot,
+    },
+    {
+      path: '/hadraja',
+      name: 'hadraja',
+      component: Hadraja,
     },
   ],
 })

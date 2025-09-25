@@ -44,6 +44,10 @@
                     <input type="text" v-model="form.janij_address" class="form-control" required />
                     <div class="invalid-feedback">Debes llenar el campo</div>
                 </div>
+                <div class="col-12">
+                    <label class="form-label" for="form-dni">DNI</label>
+                    <input type="number" id="form-dni" v-model="form.dni" class="form-control">
+                </div>
             </div>
 
             <div class="row mb-5">
@@ -53,7 +57,8 @@
                 </div>
                 <div class="col-md-6 col-sm-12">
                     <label class="form-label" for="janijtype">Tipo de janij</label>
-                    <select name="janijtype" id="janijtype" v-model="form.type_janij" class="form-control">
+                    <select name="janijtype" id="janijtype" v-model="form.type_janij" class="form-select">
+                        <option disabled value="">Seleccione un tipo</option>
                         <option value="Fijo">Fijo</option>
                         <option value="Rotativo">Rotativo</option>
                         <option value="Esporádico">Esporádico</option>
@@ -104,6 +109,7 @@ export default {
                 name: "",
                 lastname: "",
                 birthdate: "",
+                dni: "",
                 kvutza: "",
                 janij_cellphone: "",
                 janij_address: "",

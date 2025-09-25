@@ -1,18 +1,21 @@
 <template>
     <div class="row g-0">
-        <div class="col col-md-4 col-3  ">
+        <div class="col col-md-4 col-3">
             <img :src="picUrl" :alt="janij.name" class="picjanij align-self-center border rounded-start" />
         </div>
         <div class="col align-self-center">
-            <div class="card-body">
-                <h5 class="card-title">{{ janij.name }} {{ janij.lastname }}</h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">{{ kvutzaName }}</h6>
-                <p class="card-text">{{ janij.janij_address }}</p>
+            <div class="card-body d-flex flex-column">
+                <h6 class="card-title">{{ janij.name }} {{ janij.lastname }}</h6>
+                <p class="card-subtitle mb-2 text-body-secondary">{{ kvutzaName }}</p>
+                <div class="mt-auto d-flex justify-content-start">
+
+                    <div :class="badgeClass" class="badge mt-auto">{{ janij.type_janij }}</div>
+
+                </div>
             </div>
         </div>
     </div>
 </template>
-
 <script>
 export default {
     name: "Janij",
@@ -36,6 +39,16 @@ export default {
             return this.janij.pic && this.janij.pic !== ""
                 ? this.janij.pic
                 : "https://37assets.37signals.com/svn/765-default-avatar.png"; // archivo dentro de /public
+        },
+        badgeClass() {
+            // Mapeamos los tipos a clases de Bootstrap con bg-light + border oscuro
+            const map = {
+                "Fijo": "bg-success-subtle text-success border border-success",
+                "Rotativo": "bg-primary-subtle text-primary border border-primary",
+                "Esporádico": "bg-warning-subtle text-warning border border-warning",
+                "Inactivo": "bg-danger-subtle text-danger border border-danger"
+            }
+            return map[this.janij.type_janij] || "bg-secondary text-secondary border border-secondary"
         }
     }
 }
@@ -65,6 +78,10 @@ export default {
 }
 
 .card>.row {
+    height: 100%;
+}
+
+.card-body {
     height: 100%;
 }
 

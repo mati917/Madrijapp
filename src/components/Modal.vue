@@ -53,6 +53,11 @@ defineEmits(["update:modelValue"])
     z-index: 1200;
 }
 
+/* 🔥 Nuevo: hacer que el form y container ocupen todo */
+.modal-content>form {
+    height: 100% !important;
+    overflow-y: scroll;
+}
 
 .modal-backdrop {
     position: fixed;
@@ -89,8 +94,6 @@ defineEmits(["update:modelValue"])
     transform: translateX(0);
 }
 
-
-
 /* RESPONSIVE */
 @media (max-width: 991.98px) {
     .modal-slide {
@@ -111,7 +114,6 @@ defineEmits(["update:modelValue"])
 
     .modal-content:first-child {
         width: 100vw;
-        height: 100%;
         position: absolute;
     }
 

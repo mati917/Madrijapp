@@ -160,6 +160,7 @@ async function fetchHadrajot() {
 			.from("Hadrajot")
 			.select("*")
 			.order("cicloLectivo", { ascending: false })
+			.order("id_kvutza", { ascending: true })
 		if (error) throw error
 		hdrjt.value = data ?? []
 	} catch (error) {
