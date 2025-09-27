@@ -10,7 +10,6 @@
                 <div class="mt-auto d-flex justify-content-start">
 
                     <div :class="badgeClass" class="badge mt-auto">{{ janij.type_janij }}</div>
-
                 </div>
             </div>
         </div>
@@ -38,7 +37,7 @@ export default {
             // Si no existe janij.pic o está vacío, usar el avatar por defecto
             return this.janij.pic && this.janij.pic !== ""
                 ? this.janij.pic
-                : "https://37assets.37signals.com/svn/765-default-avatar.png"; // archivo dentro de /public
+                : "/public/img/default-avatar.png"; // archivo dentro de /public
         },
         badgeClass() {
             // Mapeamos los tipos a clases de Bootstrap con bg-light + border oscuro

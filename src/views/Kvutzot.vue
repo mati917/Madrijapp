@@ -32,26 +32,14 @@
             referente</div>
 
         <!-- Modal Añadir Kvutza -->
-        <transition name="modal-slide">
-            <div v-if="showModal" class="modal-slide">
-                <div class="modal-content">
-                    <button class="btn btn-close close-btn" @click="showModal = false" aria-label="Cerrar"></button>
-                    <KvutzaForm @added="refreshKvutzot" />
-                </div>
-                <div class="modal-backdrop" @click="showModal = false"></div>
-            </div>
-        </transition>
+        <Modal v-model="showModal">
+            <KvutzaForm @added="refreshKvutzot" />
+        </Modal>
 
         <!-- Modal Editar Kvutza -->
-        <transition name="modal-slide">
-            <div v-if="editingKvutza" class="modal-slide">
-                <div class="modal-content">
-                    <button class="btn btn-close close-btn" @click="editingKvutza = null" aria-label="Cerrar"></button>
-                    <KvutzaEditForm :kvutza="editingKvutza" @updated="refreshKvutzot" />
-                </div>
-                <div class="modal-backdrop" @click="editingKvutza = null"></div>
-            </div>
-        </transition>
+        <Modal v-model="editingKvutza">
+            <KvutzaEditForm :kvutza="editingKvutza" @updated="refreshKvutzot" />
+        </Modal>
     </div>
 </template>
 
@@ -64,6 +52,7 @@ import Kvutza_row from "../components/Kvutza_row.vue"
 import KvutzaForm from "../components/Kvutza_Form.vue"
 import KvutzaEditForm from "../components/Kvutza_EditForm.vue"
 import Titulo from "@/components/Titulo.vue"
+import Modal from "@/components/Modal.vue"
 
 const { supabase } = useSupabase()
 const { roles, loadUserRoles, can } = useAuthRoles()
@@ -71,7 +60,7 @@ const errorMessage = ref("")
 const successMessage = ref("")
 const kvutzot = ref([])
 const showModal = ref(false)
-const editingKvutza = ref(null)
+const editingKvutza = ref(false)
 const isLoggedIn = ref(false)
 
 

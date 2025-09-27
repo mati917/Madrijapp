@@ -10,6 +10,7 @@ import Tzevet from '@/views/Tzevet.vue'
 import Boguer from '@/views/Boguer.vue'
 import Hadrajot from '@/views/Hadrajot.vue'
 import Hadraja from '@/views/Hadraja.vue'
+import Eventos from '@/views/Eventos.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,11 +21,6 @@ const router = createRouter({
       component: Home,
     },
     {
-      path: '/janijim',
-      name: 'janijim',
-      component: Janijim,
-    },
-    {
       path: '/signin',
       name: 'SignIn',
       component: SignIn,
@@ -33,6 +29,22 @@ const router = createRouter({
       path: '/signup',
       name: 'SignUp',
       component: SingUp,
+    },
+    {
+      path: '/janijim',
+      name: 'janijim',
+      component: Janijim,
+    },
+    {
+      path: '/janijim/:dni?',
+      name: 'janijim',
+      component: Janijim,
+      /*
+      Como usar el parámetro opcional:
+      1. Si no se pasa el parámetro (ej: /janijim), se muestra la lista completa de janijim.
+      2. Si se pasa el parámetro (ej: /janijim/12345678), se muestra el perfil del janij con ese DNI.
+      <router-link :to="`/janijim/${janij.dni}`">Ver Janij</router-link> como ejemplo.
+      */
     },
     {
       path: '/perfil',
@@ -73,6 +85,11 @@ const router = createRouter({
       path: '/hadraja',
       name: 'hadraja',
       component: Hadraja,
+    },
+    {
+      path: '/eventos',
+      name: 'eventos',
+      component: Eventos,
     },
   ],
 })

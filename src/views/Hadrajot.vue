@@ -47,8 +47,52 @@
 				</table>
 			</main>
 
+			<!-- Hadrajot actuales -->
+			<section class="row mt-5">
+				<Subtitulo titulo="Otras hadrajot actuales" class="p-1">
+					<button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+						data-bs-target="#otras-hadrajot" aria-expanded="false" aria-controls="collapseExample">
+						Ver <i class="bi bi-eye-fill"></i>
+					</button>
+				</Subtitulo>
+
+				<table class="table collapse" id="otras-hadrajot">
+					<thead>
+						<tr>
+							<th>Año</th>
+							<th>Ken</th>
+							<th>Nombre</th>
+							<th>Shijvá</th>
+							<th>Madrijim</th>
+							<th>Roshei Shijvá</th>
+							<th>Tipo</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="hdrj in hadrajotActualesOtras" :key="hdrj.id_hdrj" class="align-middle hover-effect"
+							@dblclick="openEditModal(hdrj)">
+							<th>{{ hdrj.cicloLectivo }}</th>
+							<td>{{ hdrj.ken }}</td>
+							<td>{{ kvutzaMap(hdrj.id_kvutza) }}</td>
+							<td>{{ hdrj.shijvaActual }}</td>
+							<td>
+								<a v-for="mdrj in hdrj.id_mdrjm" :key="mdrj" :href="'/boguer/' + mdrj">
+									{{ boguerMap(mdrj) }}<br />
+								</a>
+							</td>
+							<td>
+								<a v-for="rshj in hdrj.id_roshShijva" :key="rshj" :href="'/boguer/' + rshj">
+									{{ boguerMap(rshj) }}<br />
+								</a>
+							</td>
+							<td>{{ hdrj.tipo }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+
 			<!-- Hadrajot históricas -->
-			<section>
+			<section class="row mt-5">
 				<Subtitulo titulo="Hadrajot históricas" />
 				<table class="table">
 					<thead>
@@ -59,6 +103,7 @@
 							<th>Shijvá</th>
 							<th>Madrijim</th>
 							<th>Roshei Shijvá</th>
+							<th>Tipo</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -78,6 +123,7 @@
 									{{ boguerMap(rshj) }}<br />
 								</a>
 							</td>
+							<td>{{ hdrj.tipo }}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -144,6 +190,12 @@ const form = ref({
 	id_roshShijva: []
 })
 
+const hadrajotActualesOtras = computed(() => {
+	const añoActual = new Date().getFullYear()
+	return hdrjt.value.filter(
+		h => h.cicloLectivo === añoActual
+			&& h.tipo !== 'Común')
+})
 const hadrajotActuales = computed(() => {
 	const añoActual = new Date().getFullYear()
 	return hdrjt.value.filter(h => h.cicloLectivo === añoActual)
@@ -161,6 +213,7 @@ async function fetchHadrajot() {
 			.select("*")
 			.order("cicloLectivo", { ascending: false })
 			.order("id_kvutza", { ascending: true })
+			.order("tipo", { ascending: true })
 		if (error) throw error
 		hdrjt.value = data ?? []
 	} catch (error) {

@@ -3,27 +3,51 @@
         <div v-if="modelValue" class="modal-slide">
             <!-- Contenido -->
             <div class="modal-content">
-                <button class="btn btn-close close-btn" @click="$emit('update:modelValue', false)" aria-label="Cerrar">
-                </button>
-
-                <!-- Slot para inyectar el contenido (forms, info, etc.) -->
+                <button class="btn btn-close close-btn" @click="closeModal" aria-label="Cerrar"></button>
                 <slot></slot>
             </div>
 
             <!-- Backdrop -->
-            <div class="modal-backdrop" @click="$emit('update:modelValue', false)"></div>
+            <div class="modal-backdrop" @click="closeModal"></div>
         </div>
     </transition>
 </template>
 
 <script setup>
-import { toRefs } from "vue"
+import { toRefs, watch, onMounted, onUnmounted } from "vue"
+
 const props = defineProps({
     modelValue: { type: Boolean, required: true }
 })
 const { modelValue } = toRefs(props)
-defineEmits(["update:modelValue"])
+const emit = defineEmits(["update:modelValue"])
+
+function closeModal() {
+    emit("update:modelValue", false)
+}
+
+// Función para cerrar al ESC
+function handleEsc(event) {
+    if (event.key === "Escape" && modelValue.value) {
+        closeModal()
+    }
+}
+
+// Escuchar y limpiar eventos según el estado del modal
+watch(modelValue, (open) => {
+    if (open) {
+        window.addEventListener("keydown", handleEsc)
+    } else {
+        window.removeEventListener("keydown", handleEsc)
+    }
+})
+
+// Asegurar limpieza si el componente se destruye
+onUnmounted(() => {
+    window.removeEventListener("keydown", handleEsc)
+})
 </script>
+
 
 <style scoped>
 .modal-slide {

@@ -1,8 +1,8 @@
 <template>
     <div class="container my-5">
         <Titulo titulo="Boguer">
-            <button v-if="isLoggedIn && can(['ADM', 'HNG'])" type="button" class="btn btn-outline-primary col-2"
-                @click="openEditForm">
+            <button v-if="isLoggedIn && (can(['ADM', 'HNG', 'BTJ']))" type="button"
+                class="btn btn-outline-primary col-2" @click="openEditForm">
                 Editar
             </button>
         </Titulo>
@@ -36,10 +36,10 @@
                             <a :href="'mailto:' + profile.email"> {{ profile.email }}</a>
                         </p>
                         <p class="card-text">
-                            <strong>Tafkidim:</strong> {{ profile.tafkidim.join(", ") }}
+                            <strong>Tafkidim:</strong> {{ profile.tafkidim.join(", ") || '' }}
                         </p>
                         <p v-if="can('ADM', 'HNG', 'MZK')">
-                            <strong>Roles: </strong> {{ profile.roles.join(", ") }}
+                            <strong>Roles: </strong> {{ profile.roles.join(", ") || '' }}
                         </p>
                     </div>
                 </div>
@@ -59,28 +59,24 @@
                             <label for="profile-name" class="form-label">Nombre</label>
                             <input v-model="formData.name" type="text" id="profile-name" class="form-control"
                                 required />
-                            <div class="invalid-feedback">Debes completar los datos correctamente</div>
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="profile-lastname" class="form-label">Apellido</label>
                             <input v-model="formData.lastname" type="text" id="profile-lastname" class="form-control"
                                 required />
-                            <div class="invalid-feedback">Debes completar los datos correctamente</div>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-12 col-md-6">
                             <label for="profile-dni" class="form-label">DNI</label>
-                            <input v-model="formData.dni" type="number" id="profile-dni" class="form-control"
-                                required />
-                            <div class="invalid-feedback">Debes completar los datos correctamente</div>
+                            <input v-model="formData.dni" type="number" min="10000000" max="100000000" id="profile-dni"
+                                class="form-control" required />
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="profile-nacimiento" class="form-label">Nacimiento</label>
                             <input v-model="formData.nacimiento" type="date" id="profile-nacimiento"
                                 class="form-control" />
-                            <div class="invalid-feedback">Debes completar los datos correctamente</div>
                         </div>
                     </div>
 
@@ -89,28 +85,24 @@
                             <label for="profile-celular" class="form-label">Celular</label>
                             <input v-model="formData.celular" type="text" id="profile-celular" class="form-control"
                                 required />
-                            <div class="invalid-feedback">Debes completar los datos correctamente</div>
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="profile-email" class="form-label">E-Mail</label>
                             <input v-model="formData.email" type="email" id="profile-email" class="form-control"
                                 required />
-                            <div class="invalid-feedback">Debes completar los datos correctamente</div>
                         </div>
                     </div>
 
-                    <div class="row mb-3" v-if="can(['ADM', 'HNG'])">
+                    <div class="row mb-3">
                         <div class="col-12">
                             <label for="profile-tafkidim" class="form-label">Tafkidim</label>
                             <textarea id="profile-tafkidim" v-model="formData.tafkidim" class="form-control" rows="3"
                                 placeholder="Rosh kvutza&#10;Madrij&#10;Boguer"></textarea>
-                            <div class="invalid-feedback">Debes completar los datos correctamente</div>
                         </div>
 
                         <div class="col-12 col-md-6 mt-3">
                             <label for="profile-roles" class="form-label">Roles</label>
                             <select id="profile-roles" v-model="formData.roles" class="form-select" multiple required>
-                                <option value="" disabled>Elegir un rol</option>
                                 <option value="BGR">BGR</option>
                                 <option value="ADM">ADM</option>
                                 <option value="HNG">HNG</option>
@@ -119,7 +111,14 @@
                                 <option value="BTJ">BTJ</option>
                                 <option value="HDR">HDR</option>
                             </select>
-                            <div class="invalid-feedback">Debes completar los datos correctamente</div>
+                        </div>
+                    </div>
+
+                    <!-- Foto -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label for="profile-pic" class="form-label">Foto</label>
+                            <input type="file" id="profile-pic" class="form-control" @change="handlePicChange" />
                         </div>
                     </div>
 
@@ -152,10 +151,12 @@ const { loadUserRoles, can } = useAuthRoles()
 const profile = ref(null)
 const kvutzot = ref([])
 const loading = ref(true)
+const user = ref(null)
 const error = ref(null)
 const isLoggedIn = ref(false)
 
 const modal_editProfile = ref(false)
+const newPicFile = ref(null)
 
 const formData = ref({
     name: "",
@@ -198,9 +199,8 @@ onMounted(async () => {
     }
 
     try {
-        const { data: kvData, error: kvError } = await supabase.from("Kvutzot").select("*")
-        if (kvError) throw kvError
-        kvutzot.value = kvData
+        const { data: kvData } = await supabase.from("Kvutzot").select("*")
+        kvutzot.value = kvData || []
 
         const { data: boguerData, error: boguerError } = await supabase
             .from("Bogrim")
@@ -233,6 +233,12 @@ function openEditForm() {
     modal_editProfile.value = true
 }
 
+function handlePicChange(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    newPicFile.value = file
+}
+
 async function handleSubmit() {
     try {
         const updateData = {
@@ -243,16 +249,38 @@ async function handleSubmit() {
                 .filter(t => t.length > 0)
         }
 
-        const { error: updateError } = await supabase
+        // ✅ Subida de foto
+        if (newPicFile.value) {
+            if (profile.value?.pic_name) {
+                await supabase.storage.from("BogrimPic").remove([profile.value.pic_name])
+            }
+            const ext = newPicFile.value.name.split(".").pop()
+            const fileName = `${formData.value.dni}-bogrim.${ext}`
+
+            const { error: uploadError } = await supabase.storage
+                .from("BogrimPic")
+                .upload(fileName, newPicFile.value, { upsert: true })
+            if (uploadError) throw uploadError
+
+            const { data: publicData } = supabase.storage
+                .from("BogrimPic")
+                .getPublicUrl(fileName)
+
+            updateData.pic = `${publicData.publicUrl}?t=${Date.now()}`
+            updateData.pic_name = fileName
+        }
+
+        const { error } = await supabase
             .from("Bogrim")
             .update(updateData)
             .eq("dni", profile.value.dni)
 
-        if (updateError) throw updateError
+        if (error) throw error
 
         profile.value = { ...profile.value, ...updateData }
         modal_editProfile.value = false
         alert("✅ Perfil actualizado correctamente")
+        router.push(`/boguer/${updateData.dni}`)
     } catch (err) {
         alert("❌ Error al actualizar: " + err.message)
     }
@@ -260,20 +288,36 @@ async function handleSubmit() {
 
 async function handleDelete() {
     if (!confirm("¿Seguro que quieres borrar este perfil?")) return
+
     try {
-        const { error: deleteError } = await supabase
+        // 1. Intentar borrar la foto si existe
+        if (profile.value?.pic_name) {
+            const { error: delPhotoError } = await supabase
+                .storage
+                .from("BogrimPic")
+                .remove([profile.value.pic_name])
+
+            if (delPhotoError) {
+                console.warn("⚠️ No se pudo borrar la foto:", delPhotoError.message)
+                // No hacemos throw, así igual se elimina el perfil
+            }
+        }
+
+        // 2. Borrar el registro del boguer
+        const { error: delRowError } = await supabase
             .from("Bogrim")
             .delete()
             .eq("dni", profile.value.dni)
 
-        if (deleteError) throw deleteError
+        if (delRowError) throw delRowError
 
         alert("🗑️ Perfil eliminado")
-        router.push("/") // redirigir a inicio o listado
+        router.push("/")
     } catch (err) {
         alert("❌ Error al borrar: " + err.message)
     }
 }
+
 </script>
 
 <style scoped>
@@ -290,15 +334,5 @@ form {
     height: auto;
     object-fit: cover;
     border-radius: 8px;
-}
-
-.card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    transition: transform 0.2s;
-}
-
-.card>.row {
-    height: 100%;
 }
 </style>

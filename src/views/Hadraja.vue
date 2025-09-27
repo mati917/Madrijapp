@@ -1,6 +1,7 @@
 <template>
     <div class="container-md my-4">
-        <Titulo titulo="Hadrajá"></Titulo>
+        <Titulo titulo="Hadrajá">
+        </Titulo>
         <!-- Error -->
         <div v-if="errorMessage" class="alert alert-danger row">{{ errorMessage }}</div>
 
@@ -66,7 +67,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(janij, index) in janijim_hdrj">
+                                    <tr v-for="(janij, index) in janijim_hdrj" class="hover-effect"
+                                        @dblclick="router.push('/janijim/' + janij.dni)">
                                         <th scope="row">{{ index + 1 }}</th>
                                         <td>{{ janij.name }}</td>
                                         <td>{{ janij.lastname }}</td>
@@ -92,6 +94,34 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="mis-peulot">
+                    <h3 class="text-primary">
+                        Mis janijim
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"> Ver
+                            peulot
+                            <span class="badge bg-primary-subtle text-primary"></span>
+                        </button>
+                    </h3>
+                    <div class="card card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fecha</th>
+                                    <th>Nombre</th>
+                                    <td>Kvutzá</td>
+                                    <td>Tipo hadrajá</td>
+                                    <th>Supervisada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- Bloque para Rosh Shijvá -->
@@ -110,8 +140,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="hdr in hdrj_jnj" :key="hdr.id_hdrj" class="align-middle text-center">
-                                <th class="hover-effect" scope="row">{{ kvutzaMap(hdr.id_kvutza) }}</th>
+                            <tr v-for="hdr in hdrj_jnj" :key="hdr.id_hdrj"
+                                class="align-middle text-center hover-effect">
+                                <th class=" hover-effect" scope="row">{{ kvutzaMap(hdr.id_kvutza) }}</th>
                                 <td class="hover-effect">{{ hdr.shijvaActual }}</td>
                                 <td class="hover-effect">{{ hdr.ken }}</td>
                                 <td class="hover-effect">
@@ -153,7 +184,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(janij, index) in janijim_hdrj_jnj">
+                                    <tr v-for="(janij, index) in janijim_hdrj_jnj" class="hover-effect"
+                                        @dblclick="router.push('/janijim/' + janij.dni)">
                                         <th scope="row">{{ index + 1 }}</th>
                                         <td>{{ janij.name }}</td>
                                         <td>{{ janij.lastname }}</td>
@@ -188,6 +220,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue"
+import { useRouter } from "vue-router"
 import { useSupabase } from '@/services/supabase'
 import { checkAuth } from "@/services/useAuthCheck"
 import { useAuthRoles } from "@/services/useAuthRoles"
@@ -196,6 +229,7 @@ import { cargarBogrim, boguerMap } from "@/services/mapBoguer"
 import Titulo from "@/components/Titulo.vue";
 import Subtitulo from "@/components/Subtitulo.vue";
 
+const router = useRouter()
 const errorMessage = ref("")
 const isLoggedIn = ref(false)
 const { supabase } = useSupabase()
@@ -208,7 +242,6 @@ const janijim_hdrj = ref([])
 const janijim_hdrj_jnj = ref([])
 const yeartoday = new Date().getFullYear()
 
-console.log(yeartoday)
 
 function badgeClass(type) {
     // Mapeamos los tipos a clases de Bootstrap con bg-light + border oscuro
@@ -267,6 +300,7 @@ onMounted(async () => {
                 .from('Hadrajot')
                 .select('*')
                 .eq('cicloLectivo', yeartoday)
+                .eq('tipo', 'Común')
                 .contains('id_mdrjm', [usuario.value])
             if (errorHdrj) throw errorHdrj
             hdrj.value = dataHdrj
@@ -285,11 +319,13 @@ onMounted(async () => {
             }
         }
 
-
+        // Obtención hadraja rosheada
         if (can('JNJ')) {
             const { data: dataHdrjJnj, error: errorHdrjJnj } = await supabase
                 .from('Hadrajot')
                 .select('*')
+                .eq('tipo', 'Común')
+                .eq('cicloLectivo', yeartoday)
                 .contains('id_roshShijva', [usuario.value])
             if (errorHdrjJnj) throw errorHdrjJnj
             hdrj_jnj.value = dataHdrjJnj

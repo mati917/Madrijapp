@@ -43,6 +43,13 @@
                         <option v-for="s in shijvot" :key="s" :value="s">{{ s }}</option>
                     </select>
                 </div>
+                <div class="col-12">
+                    <label for="hdrj_tipo" class="form-label">Tipo de hadrajá</label>
+                    <select class="form-select" id="hdrj_shijva" v-model="form.tipo">
+                        <option value="" disabled>Seleccionar tipo...</option>
+                        <option v-for="ht in hadrajot_types" :key="ht" :value="ht">{{ ht }}</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Madrijim / Roshei Shijvá -->
@@ -77,6 +84,8 @@
 import { computed, ref, onMounted } from 'vue'
 import { shijvot } from '@/assets/js/shijvot'
 import { useSupabase } from '@/services/supabase'
+import { hadrajot_types } from "@/assets/js/hadrajot_type"
+
 
 const emit = defineEmits(['submit'])
 const props = defineProps({
@@ -92,6 +101,7 @@ const kvutzot = ref([])
 const bogrim = ref([])
 const bogrimHDR = computed(() => bogrim.value.filter(b => b.roles?.includes('HDR')))
 const bogrimJNJ = computed(() => bogrim.value.filter(b => b.roles?.includes('JNJ')))
+
 
 function handleSubmit() {
     emit('submit', { ...props.form }) // se emite el form que viene del padre

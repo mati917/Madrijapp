@@ -35,7 +35,7 @@
                             <a class="nav-link" href="/hadraja">Hadrajá</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link">Eventos</a>
+                            <a class="nav-link" href="/eventos">Eventos</a>
                         </li>
                         <li v-if="can('ADM', 'HNG', 'MZK', 'JNJ')" class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"

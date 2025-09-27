@@ -1,5 +1,7 @@
 <template>
-    <h2 class="mb-4 text-primary my-3 border-bottom border-primary">{{ titulo }}</h2>
+    <h2 class="mb-4 text-primary my-3 border-bottom border-primary">{{ titulo }}
+        <slot></slot>
+    </h2>
 </template>
 
 <script setup>

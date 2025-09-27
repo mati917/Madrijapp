@@ -1,33 +1,36 @@
 <template>
-    <main class="container p-3">
+    <div class="container p-3">
         <Titulo titulo="Janijim">
-            <!-- Botón visible solo si hay sesión -->
             <button v-if="isLoggedIn" type="button" id="add-janij" class="btn btn-outline-primary col-3 col-md-2"
                 @click="showModal = true">
                 Añadir
             </button>
         </Titulo>
 
-
-        <!-- Error -->
-        <div v-if="errorMessage" class="alert alert-danger row" role="alert">
-            {{ errorMessage }}
+        <!-- Barra de búsqueda -->
+        <div class="my-3">
+            <input type="text" class="form-control" placeholder="Buscar por cualquier campo..." v-model="searchQuery" />
         </div>
+
 
         <!-- Loading -->
         <div v-if="loading" class="text-center my-4">
             <div class="spinner-border text-primary" role="status"></div>
         </div>
 
+        <!-- Error -->
+        <div v-else-if="errorMessage" class="alert alert-danger row" role="alert">
+            {{ errorMessage }}
+        </div>
         <!-- Cards -->
-        <div v-else class="row g-4">
+        <main v-else class="row g-4">
             <div v-for="janij in janijim" :key="janij.id" class="col-12 col-md-6 col-lg-4">
                 <div class="card p-2 hover-effect" @click="abrirDetalles(janij)">
                     <Janij :janij="janij" :kvutzot="kvutzot" />
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
     <!-- Modal JanijForm -->
     <Transition name="modal-slide">
@@ -54,6 +57,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from "vue"
+import { useRoute, useRouter } from "vue-router" // <-- importamos router
 import { useSupabase } from "../services/supabase"
 import { checkAuth } from "../services/useAuthCheck"
 import { useAuthRoles } from "@/services/useAuthRoles"
@@ -62,9 +66,11 @@ import Janij from "../components/Janij.vue"
 import JanijForm from "@/components/JanijForm.vue"
 import JanijDetails from "@/components/JanijDetails.vue"
 
-
-const { supabase } = useSupabase();
+const route = useRoute()
+const router = useRouter()
+const { supabase } = useSupabase()
 const { roles, loadUserRoles, can } = useAuthRoles()
+
 const janijim = ref([])
 const kvutzot = ref([])
 const loading = ref(true)
@@ -73,41 +79,46 @@ const showModal = ref(false)
 const showDetails = ref(false)
 const janijSeleccionado = ref(null)
 const isLoggedIn = ref(false)
+const searchQuery = ref("")
 
-onMounted(async () => {
-    const loggedIn = await checkAuth()
-    isLoggedIn.value = loggedIn
-
-    if (!loggedIn) {
-        errorMessage.value = "⚠️ Debes iniciar sesión para ver los janijim."
-        loading.value = false
-        return
-    }
-    await loadUserRoles();
-
+async function fetchJanijim(search = "", openId = null) {
+    loading.value = true
+    errorMessage.value = ""
 
     try {
-        // Traer kvutzot
-        const { data: kvData, error: kvError } = await supabase
-            .from("Kvutzot")
-            .select("id_kvutza, name")
-        if (kvError) throw kvError
-        kvutzot.value = kvData
-
-        // Traer janijim
-        const { data, error } = await supabase
+        // Traer todos los janijim
+        let { data, error } = await supabase
             .from("Janijim")
             .select("*")
             .order("kvutza", { ascending: true })
         if (error) throw error
-        janijim.value = data
 
-        // Reemplazar id_kvutza por name para mostrar
-        janijim.value = janijim.value.map(j => {
+        // Reemplazar id_kvutza por name
+        data = data.map(j => {
             const kv = kvutzot.value.find(k => k.id_kvutza === j.kvutza)
             return { ...j, kvutzaName: kv ? kv.name : j.kvutza }
         })
 
+        // Filtrado por búsqueda
+        if (search.trim() !== "") {
+            const searchLower = search.toLowerCase()
+            const searchNum = Number(search)
+            data = data.filter(j =>
+                (j.name && j.name.toLowerCase().includes(searchLower)) ||
+                (j.lastname && j.lastname.toLowerCase().includes(searchLower)) ||
+                (j.kvutzaName && j.kvutzaName.toLowerCase().includes(searchLower)) ||
+                (j.janij_cellphone && j.janij_cellphone.includes(searchLower)) ||
+                (!isNaN(searchNum) && j.dni === searchNum)
+            )
+        }
+
+        janijim.value = data
+
+        // Si recibimos un ID para abrir, buscamos y abrimos el modal
+        if (openId) {
+            const janij = data.find(j => j.dni === Number(openId))
+            if (janij) abrirDetalles(janij)
+        }
 
     } catch (err) {
         console.error(err)
@@ -115,7 +126,43 @@ onMounted(async () => {
     } finally {
         loading.value = false
     }
+}
+
+onMounted(async () => {
+    const loggedIn = await checkAuth()
+    isLoggedIn.value = loggedIn
+    if (!loggedIn) {
+        errorMessage.value = "⚠️ Debes iniciar sesión para ver los janijim."
+        loading.value = false
+        return
+    }
+
+    await loadUserRoles()
+
+    try {
+        // Traer kvutzot primero
+        const { data: kvData, error: kvError } = await supabase
+            .from("Kvutzot")
+            .select("id_kvutza, name")
+        if (kvError) throw kvError
+        kvutzot.value = kvData
+
+        // Traer janijim y abrir modal si viene DNI en la ruta
+        const dniParam = route.params.dni ? Number(route.params.dni) : null
+
+        await fetchJanijim("", dniParam)
+
+    } catch (err) {
+        console.error(err)
+        errorMessage.value = "No se pudieron cargar los datos."
+    } finally {
+        loading.value = false
+    }
 })
+
+
+// Re-fetch dinámico al cambiar la búsqueda
+watch(searchQuery, (newVal) => fetchJanijim(newVal))
 
 function abrirDetalles(janij) {
     janijSeleccionado.value = { ...janij }
@@ -127,18 +174,14 @@ function cerrarDetalles() {
     janijSeleccionado.value = null
 }
 
+// ESC
 function handleEsc(event) {
-    if (event.key === "Escape" && showDetails.value) {
-        cerrarDetalles()
-    }
+    if (event.key === "Escape" && showDetails.value) cerrarDetalles()
 }
 
 watch(showDetails, (visible) => {
-    if (visible) {
-        window.addEventListener("keydown", handleEsc)
-    } else {
-        window.removeEventListener("keydown", handleEsc)
-    }
+    if (visible) window.addEventListener("keydown", handleEsc)
+    else window.removeEventListener("keydown", handleEsc)
 })
 </script>
 
