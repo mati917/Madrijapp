@@ -1,6 +1,10 @@
 <template>
     <div class="container-md my-4">
         <Titulo titulo="Hadrajá">
+            <button v-if="isLoggedIn && can(['HDR'])" type="button" class="btn btn-outline-primary col-2"
+                @click="modal_planificar = true">
+                Planificar
+            </button>
         </Titulo>
         <!-- Error -->
         <div v-if="errorMessage" class="alert alert-danger row">{{ errorMessage }}</div>
@@ -43,7 +47,7 @@
                     </div>
                 </main>
 
-                <div id="mis-janijim">
+                <div id="mis-janijim" class="row mt-3">
                     <h3 class="text-primary">
                         Mis janijim
                         <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
@@ -95,29 +99,40 @@
                     </div>
                 </div>
 
-                <div id="mis-peulot">
+                <div id="mis-peulot" class="row mt-3">
                     <h3 class="text-primary">
-                        Mis janijim
+                        Mis Peulot
                         <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"> Ver
-                            peulot
-                            <span class="badge bg-primary-subtle text-primary"></span>
+                            data-bs-target="#mis-peulot-table" aria-expanded="false" aria-controls="collapseExample">
+                            Ver peulot
+                            <span class="badge bg-primary-subtle text-primary">{{ planis_hdrj.length }}</span>
                         </button>
                     </h3>
-                    <div class="card card-body">
+                    <div class="card card-body collapse" id="mis-peulot-table">
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Fecha</th>
                                     <th>Nombre</th>
-                                    <td>Kvutzá</td>
-                                    <td>Tipo hadrajá</td>
+                                    <th>Kvutzá</th>
+                                    <th>Tipo hadrajá</th>
                                     <th>Supervisada</th>
                                 </tr>
                             </thead>
                             <tbody>
-
+                                <tr v-for="(plan, index) in planis_hdrj" :key="plan.id" class="hover-effect"
+                                    @dblclick="router.push('/planificacion/' + plan.id)">
+                                    <th scope="row">{{ index + 1 }}</th>
+                                    <td>{{ new Date(plan.fecha).toLocaleDateString() }}</td>
+                                    <td>{{ plan.nombre }}</td>
+                                    <td>{{ kvutzaMap(mapHadraja_kvutza(plan.hadraja)) }}</td>
+                                    <td>{{ mapHadraja_type(plan.hadraja) }}</td>
+                                    <td>
+                                        <span v-if="plan.jnj_sup" class="text-success">Sí</span>
+                                        <span v-else class="text-danger">No</span>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -214,6 +229,10 @@
             </aside>
         </div>
 
+        <Modal v-model="modal_planificar">
+            <h3 class="text-center text-primary">Próximamente...</h3>
+
+        </Modal>
     </div>
 </template>
 
@@ -226,8 +245,10 @@ import { checkAuth } from "@/services/useAuthCheck"
 import { useAuthRoles } from "@/services/useAuthRoles"
 import { cargarKvutzot, kvutzaMap } from "@/services/mapKvutza"
 import { cargarBogrim, boguerMap } from "@/services/mapBoguer"
+import { cargarHadrajot, mapHadraja_type, mapHadraja_kvutza } from "@/services/mapHadraja"
 import Titulo from "@/components/Titulo.vue";
 import Subtitulo from "@/components/Subtitulo.vue";
+import Modal from "@/components/Modal.vue"
 
 const router = useRouter()
 const errorMessage = ref("")
@@ -240,7 +261,10 @@ const hdrj = ref([]) // mi hdrj
 const hdrj_jnj = ref([]) // mi hadraja rosheada
 const janijim_hdrj = ref([])
 const janijim_hdrj_jnj = ref([])
+const planis_hdrj = ref([])
+const planis_hdrj_jnj = ref([])
 const yeartoday = new Date().getFullYear()
+const modal_planificar = ref(false)
 
 
 function badgeClass(type) {
@@ -268,6 +292,7 @@ onMounted(async () => {
 
         // 2️⃣ Cargar kvutzot y bogrim al cache
         await cargarKvutzot()
+        await cargarHadrajot()
 
         const { data: dataBogrim, error: errorBogrim } = await supabase
             .from("Bogrim")
@@ -316,8 +341,20 @@ onMounted(async () => {
 
                 if (errorJanijim) throw errorJanijim
                 janijim_hdrj.value = dataJanijim
+
+
+                // PLANIFICACIONES
+                const { data: dataPlanis, error: errorPlanis } = await supabase
+                    .from('Planificaciones')
+                    .select('*')
+                    .eq('hadraja', hdrj.value[0].id_hdrj)
+                    .order('fecha', { ascending: false })
+                if (errorPlanis) throw errorPlanis
+                planis_hdrj.value = dataPlanis
             }
+
         }
+
 
         // Obtención hadraja rosheada
         if (can('JNJ')) {

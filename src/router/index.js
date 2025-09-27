@@ -11,6 +11,7 @@ import Boguer from '@/views/Boguer.vue'
 import Hadrajot from '@/views/Hadrajot.vue'
 import Hadraja from '@/views/Hadraja.vue'
 import Eventos from '@/views/Eventos.vue'
+import Planificacion from '@/views/Planificacion.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,6 +91,11 @@ const router = createRouter({
       path: '/eventos',
       name: 'eventos',
       component: Eventos,
+    },
+    {
+      path: '/planificacion/:id?',
+      name: 'planificacion',
+      component: Planificacion,
     },
   ],
 })
